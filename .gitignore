@@ -1,3 +1,7 @@
+FINALprojApp_accessKeys.csv
+locust_script.py
+distributed.sh
+
 #ignore huggingface
 summarizeApp
 #ignore fine-tuning
