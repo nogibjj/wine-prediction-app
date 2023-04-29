@@ -1,6 +1,6 @@
 import json
 import boto3
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pandas as pd
 import re
 import io
@@ -19,16 +19,25 @@ SAGEMAKER_ENDPOINT_NAME = 'sagemaker-xgboost-2023-04-25-18-33-28-097-endpoint'
 # Initialize the SageMaker runtime client
 sagemaker_client = boto3.client('sagemaker-runtime', region_name=AWS_REGION, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 
-@app.route('/predict', methods=['POST', 'GET'])
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'POST':
-        input_data = request.get_json()
-        predictions = invoke_sagemaker_endpoint(input_data)
-        return jsonify(predictions)
-    else:
-        input_data = '14.23,1.71,2.43,15.6,127,2.8,3.06,0.28,2.29,5.64,1.04,3.92,1065'
-        predictions = invoke_sagemaker_endpoint(input_data)
-        return jsonify(predictions)
+    # if request.method == 'POST':
+    #     input_data = request.get_json()
+    #     predictions = invoke_sagemaker_endpoint(input_data)
+    #     return jsonify(predictions)
+    # else:
+    #     input_data = '14.23,1.71,2.43,15.6,127,2.8,3.06,0.28,2.29,5.64,1.04,3.92,1065'
+    #     predictions = invoke_sagemaker_endpoint(input_data)
+    #     return jsonify(predictions)
+    input_data = ','.join([str(x) for x in request.form.values()])
+    predictions = invoke_sagemaker_endpoint(input_data)
+    result = float(predictions[0])
+    result = int(result)+1
+    return render_template('index.html', prediction_text='The class is {}!'.format(result))
 
 def invoke_sagemaker_endpoint(input_data):
     # csv_StringIO = io.StringIO(input_data)
